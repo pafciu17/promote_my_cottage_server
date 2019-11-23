@@ -4,7 +4,9 @@ const io = require('socket.io')(server);
 const { getRandomString } = require('./utils');
 const { getWaterQualityFeatures } = require('./features/waterQuality');
 
-server.listen(1917);
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => console.log(`Listening on ${port}`));
 
 const maps = {};
 
