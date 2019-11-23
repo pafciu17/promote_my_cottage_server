@@ -39,7 +39,23 @@ const getBBoxPolygon = (bbox) => {
   return turf.polygon(polygonArray);
 }
 
+function getDescription(waterQualityId) {
+  switch(waterQualityId) {
+    case 1:
+      return 'Sparkling clean water! Perfect for swimming!';
+    case 2:
+      return 'Very clean water';
+    case 3:
+      return 'Perfect lake for fishing';
+  }
+  return ''
+}
+
 const getWaterQualityFeatures = async (rawInputBBox) => {
+  if (!rawInputBBox) {
+    return [];
+  }
+
   const bbox = rawInputBBox.map(reverseCoordinates).map(convertToEPSG3067);
 
   const params = getParams(bbox);
@@ -47,7 +63,15 @@ const getWaterQualityFeatures = async (rawInputBBox) => {
 
   if (response.data && response.data.features) {
     const features = response.data.features.slice(0, 4); // temporary cut number of results
-    const outputData = features.map(({ attributes, geometry }) => {
+    const outputData = features
+      .filter(({ attributes, geometry }) => {
+        if (geometry && geometry.rings && geometry.rings.length < 50) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .map(({ attributes, geometry }) => {
       const geoJsonGeometry = esriUtils.arcgisToGeoJSON({
         ...geometry,
         "spatialReference": {
@@ -59,7 +83,10 @@ const getWaterQualityFeatures = async (rawInputBBox) => {
       const coordinates = centroid && centroid.geometry && centroid.geometry.coordinates ? reverseCoordinates(convertToWGS84(centroid.geometry.coordinates)) : null;
       return {
         coordinates,
-        ..._.pick(attributes, ['Nimi', 'EkolTila'])
+        id: attributes.OBJECTID,
+        name: attributes.Nimi,
+        quality: attributes.ElkoTila,
+        description: getDescription(attributes.EkolTilaTarkennettuID)
       }
     });
     return outputData;

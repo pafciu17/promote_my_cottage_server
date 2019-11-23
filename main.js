@@ -12,7 +12,11 @@ io.on('connection', (socket) => {
 
   socket.on('fetch_map_suggestions', async (inputMap) => {
       let outputMapData;
-      const waterQuality = await getWaterQualityFeatures(inputMap.bounds);
+      let waterQuality = []
+      console.log(inputMap.zoom);
+      if (inputMap.zoom >= 12) {
+        waterQuality = await getWaterQualityFeatures(inputMap.bounds);
+      }
 
       if (!inputMap.mapId || !maps[inputMap.mapId]) {
         const mapId = getRandomString();
@@ -33,6 +37,14 @@ io.on('connection', (socket) => {
         status: 'ok',
         mapData: outputMapData
       });
-
   });
+
+  socket.on('publish_map', ({ mapId }) => {
+    console.log('publish Map ', mapId);
+  })
+
+  socket.on('fetch_map', ({ mapId }) => {
+    console.log('fetch map', mapId);
+    socket.emit('map_update', maps[mapId] || {});
+  })
 });
