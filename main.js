@@ -6,7 +6,7 @@ const { getWaterQualityFeatures } = require('./features/waterQuality');
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => console.log(`Listening on ${port}`));
+server.listen(port, () => console.log(`Listening on ${port}`));
 
 app.get('test', (req, res) => {
   console.log('test request');
