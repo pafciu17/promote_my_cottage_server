@@ -8,6 +8,11 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`Listening on ${port}`));
 
+app.get('test', => (req, res) => {
+  console.log('test req');
+  res.status(200).end();
+});
+
 const maps = {};
 
 io.on('connection', (socket) => {
