@@ -12,6 +12,8 @@ const maps = {};
 
 io.on('connection', (socket) => {
 
+  console.log('connect!');
+
   socket.on('fetch_map_suggestions', async (inputMap) => {
       let outputMapData;
       let waterQuality = []
